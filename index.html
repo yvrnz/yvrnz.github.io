@@ -128,6 +128,152 @@ code {
         be joining all of the dataframes together using the <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.merge.html">merge</a>
         function. We will also perform feature and dimension reduction to help us create features that capture
         the data better and removing features that will become redundant to avoid the <a href="https://www.geeksforgeeks.org/machine-learning/curse-of-dimensionality-in-machine-learning/">Curse of Dimensionality</a>
+  </div>
+
+  <div class="code-container">
+      <pre><code>
+        # Removing miliseconds from df1 and df2
+        df = df.drop(columns=["milliseconds"])
+        df2 = df2.drop(columns=["milliseconds"])
+        
+        # Renaming time features to be more specific
+        df["lap_time"] = df["time"]
+        df2["pit_stop_time"] = df2["time"]
+        
+        df = df.drop(columns=["time"])
+        df2 = df2.drop(columns=["time"])
+        
+        #Joining the dataframes
+        joined_df = pd.merge(
+            df,
+            df2,
+            on=['raceId', 'driverId', 'lap'],
+            how='outer'
+        )
+        
+        
+        array = []
+        grouped = joined_df.groupby(['raceId', 'driverId'])
+        
+        #Access each group to create new features that better fit the data
+        for key, group in grouped:
+    
+            #Take each racer's lap times and find the average
+            group['avg_lap_time'] = (group['lap_time'].apply(lambda x: datetime.strptime(x, "%H:%M:%S.%f") if x.count(":") > 1 else datetime.strptime(x, "%M:%S.%f"))).mean().time()
+            group = group.dropna()
+        
+            #Take each racer's pit stop times (if any taken) and find the average
+            group['avg_pit_stop_duration'] = (group['duration'].apply(lambda x: datetime.strptime(str(x), "%M.%S.%f") if str(x).count(".") > 1 else datetime.strptime(str(x), "%M:%S.%f") if str(x).count(":") >= 1 else datetime.strptime(str(x), "%S.%f"))).mean()
+        
+            group['avg_pit_stop_duration'] = group['avg_pit_stop_duration'].apply(lambda x: x.time() if isinstance(x, datetime) else x)
+        
+            #Record the maximum number of ppit stops
+            group['num_of_stops'] = group['stop'].max()
+        
+            #Remove columns "lap_time" and "duration" now that we're done with them
+            group.drop(columns=['lap_time'], inplace=True)
+            group.drop(columns=['duration'], inplace=True)
+        
+            #Record the place of each racer after the race ended
+            final_lap = group['lap'].max()
+            group['final_position'] = group[group['lap'] == final_lap]['position']
+        
+            #Drop "lap" since we're done with it
+            group.drop(columns=['lap'], inplace=True)
+            group = group.dropna()
+        
+            #Put each grouped dataframe into an array
+            array.append(group)
+    
+        #Reconnect the modified dataframes
+        final_df = pd.concat(array).reset_index(drop=True).drop_duplicates()
+        display(final_df.head())
+      </code></pre>
+  </div>
+
+  <div class="text-container">
+      <h1>Data Preprocessing</h1>
+        Result:
+  </div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>raceId</th>
+      <th>driverId</th>
+      <th>position</th>
+      <th>stop</th>
+      <th>pit_stop_time</th>
+      <th>avg_lap_time</th>
+      <th>avg_pit_stop_duration</th>
+      <th>num_of_stops</th>
+      <th>final_position</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>841</td>
+      <td>1</td>
+      <td>2</td>
+      <td>2.0</td>
+      <td>17:59:29</td>
+      <td>00:01:32.975103</td>
+      <td>00:00:23.213000</td>
+      <td>2.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>841</td>
+      <td>2</td>
+      <td>14</td>
+      <td>2.0</td>
+      <td>17:51:32</td>
+      <td>00:01:35.507035</td>
+      <td>00:00:24.045999</td>
+      <td>2.0</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>841</td>
+      <td>3</td>
+      <td>8</td>
+      <td>1.0</td>
+      <td>17:29:00</td>
+      <td>00:01:36.448908</td>
+      <td>00:00:23.716000</td>
+      <td>1.0</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>841</td>
+      <td>4</td>
+      <td>4</td>
+      <td>3.0</td>
+      <td>18:09:08</td>
+      <td>00:01:33.138465</td>
+      <td>00:00:24.055000</td>
+      <td>3.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>841</td>
+      <td>5</td>
+      <td>18</td>
+      <td>1.0</td>
+      <td>17:31:11</td>
+      <td>00:01:38.761000</td>
+      <td>00:00:24.864999</td>
+      <td>1.0</td>
+      <td>18.0</td>
+    </tr>
+  </tbody>
+</table>
 
 
 
