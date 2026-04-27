@@ -185,34 +185,35 @@ code {
         
         #Access each group to create new features that better fit the data
         for key, group in grouped:
-    
+        
             #Take each racer's lap times and find the average
             group['avg_lap_time'] = (group['lap_time'].apply(lambda x: datetime.strptime(x, "%H:%M:%S.%f") if x.count(":") > 1 else datetime.strptime(x, "%M:%S.%f"))).mean().time()
             group = group.dropna()
         
             #Take each racer's pit stop times (if any taken) and find the average
             group['avg_pit_stop_duration'] = (group['duration'].apply(lambda x: datetime.strptime(str(x), "%M.%S.%f") if str(x).count(".") > 1 else datetime.strptime(str(x), "%M:%S.%f") if str(x).count(":") >= 1 else datetime.strptime(str(x), "%S.%f"))).mean()
-        
             group['avg_pit_stop_duration'] = group['avg_pit_stop_duration'].apply(lambda x: x.time() if isinstance(x, datetime) else x)
         
             #Record the maximum number of ppit stops
             group['num_of_stops'] = group['stop'].max()
         
-            #Remove columns "lap_time" and "duration" now that we're done with them
+            #Remove columns "lap_time", "duration", and "stop" now that we're done with them
             group.drop(columns=['lap_time'], inplace=True)
             group.drop(columns=['duration'], inplace=True)
+            group.drop(columns=['stop'], inplace=True)
         
             #Record the place of each racer after the race ended
             final_lap = group['lap'].max()
             group['final_position'] = group[group['lap'] == final_lap]['position']
         
-            #Drop "lap" since we're done with it
+            #Drop "lap" and 'position' features since we're done with them
             group.drop(columns=['lap'], inplace=True)
+            group.drop(columns=['position'], inplace=True)
             group = group.dropna()
         
             #Put each grouped dataframe into an array
             array.append(group)
-    
+        
         #Reconnect the modified dataframes
         final_df = pd.concat(array).reset_index(drop=True).drop_duplicates()
         display(final_df.head())
@@ -220,14 +221,12 @@ code {
   </div>
     
   <div class="text-container">
-    <table border="1" class="dataframe">
+   <table border="1" class="dataframe">
       <thead>
         <tr style="text-align: right;">
           <th></th>
           <th>raceId</th>
           <th>driverId</th>
-          <th>position</th>
-          <th>stop</th>
           <th>pit_stop_time</th>
           <th>avg_lap_time</th>
           <th>avg_pit_stop_duration</th>
@@ -240,8 +239,6 @@ code {
           <th>0</th>
           <td>841</td>
           <td>1</td>
-          <td>2</td>
-          <td>2.0</td>
           <td>17:59:29</td>
           <td>00:01:32.975103</td>
           <td>00:00:23.213000</td>
@@ -252,8 +249,6 @@ code {
           <th>1</th>
           <td>841</td>
           <td>2</td>
-          <td>14</td>
-          <td>2.0</td>
           <td>17:51:32</td>
           <td>00:01:35.507035</td>
           <td>00:00:24.045999</td>
@@ -264,8 +259,6 @@ code {
           <th>2</th>
           <td>841</td>
           <td>3</td>
-          <td>8</td>
-          <td>1.0</td>
           <td>17:29:00</td>
           <td>00:01:36.448908</td>
           <td>00:00:23.716000</td>
@@ -276,8 +269,6 @@ code {
           <th>3</th>
           <td>841</td>
           <td>4</td>
-          <td>4</td>
-          <td>3.0</td>
           <td>18:09:08</td>
           <td>00:01:33.138465</td>
           <td>00:00:24.055000</td>
@@ -288,8 +279,6 @@ code {
           <th>4</th>
           <td>841</td>
           <td>5</td>
-          <td>18</td>
-          <td>1.0</td>
           <td>17:31:11</td>
           <td>00:01:38.761000</td>
           <td>00:00:24.864999</td>
