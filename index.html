@@ -10,7 +10,7 @@ body {
 }
 
 .text-container {
-    width: 53%;
+    width: 56%;
     margin: 50px auto;
     line-height: 1.6;
 }
@@ -85,7 +85,7 @@ code {
   </div>
 
   <div class="text-container">
-        Next, retrieve the data you plan to use and create a dataframe. A dataFrame is a two-dimensional, tabular data structure 
+        Next, retrieve the data you plan to use and create a dataframe. A <a href="dataframe">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html</a> is a two-dimensional, tabular data structure 
         with labeled axes known as rows and columns. Since the data we need to create our dataframe is on Kaggle's website we 
         will do the follwing:
   </div>
@@ -95,7 +95,7 @@ code {
       file_path1 = "lap_times.csv"
       file_path2 = "pit_stops.csv"
 
-      # Load the latest version
+      # Load the latest versions of the datasets
       df = kagglehub.dataset_load(
       KaggleDatasetAdapter.PANDAS,
       "rohanrao/formula-1-world-championship-1950-2020",
@@ -109,10 +109,32 @@ code {
       )
       </code></pre>
   </div>
-  
+
+  <div class="text-container">
+        Alternatively, if you wanted to retrieve data from a CSV file instead do the following:
+  </div>
+
+  <div class="code-container">
+      <pre><code>
+      df = df.to_csv('lap_times.csv')
+      df2 = df.to_csv('pit_stops.csv')
+      </code></pre>
+  </div>
+
+<!-- Data Preprocessing -->
+  <div class="text-container">
+      <h1>Data Preprocessing</h1>
+        Now that we have all the neccessary data we will begin to preprocess it. In this step we will
+        be joining all of the dataframes together using the <a href="merge">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.merge.html</a> 
+        function. We will also perform feature and dimension reduction to help us create features that capture
+        the data better and removing features that will become redundant to avoid the <a href="Curse of Dimensionality">https://www.geeksforgeeks.org/machine-learning/curse-of-dimensionality-in-machine-learning/</a> 
+  </div>
+
+
+
+
+
+    
 </div>
- 
-
-
 </body>
 </html>
