@@ -10,7 +10,7 @@ body {
 }
 
 .text-container {
-    width: 50%;
+    width: 53%;
     margin: 50px auto;
     line-height: 1.6;
 }
@@ -54,7 +54,6 @@ code {
   <!-- Data Collection -->
   <div class="text-container">
       <h1>Data Collection</h1>
-      <pre><code>
         The first step of the data science life cycle is data collection. After deciding on a topic, we gather information 
         relevant to the topic from sources such as company databses or websites. In this tutorial we will be using a 
         dataset from <a href="https://www.kaggle.com/">https://www.kaggle.com/</a> that contains data pertaining to 
@@ -62,7 +61,10 @@ code {
         Scientist on Kaggle named Vopani, who was inpired by the anount of data that has been collected and analyzed to 
         design, build, and test drive Formula 1 cars. Vopani's Formaula 1 World Championship dataset can be found at 
         <a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020">https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020</a>
-      </code></pre>
+  </div>
+
+  <div class="text-container">
+        Before collecting our data we make sure to import any classes that we may need later on.
   </div>
   
   <!-- Imports -->
@@ -79,6 +81,32 @@ code {
       from scipy.stats import chi2_contingency
       from statsmodels.stats.weightstats import ztest as ztest
       from scipy.linalg import fractional_matrix_power
+      </code></pre>
+  </div>
+
+  <div class="text-container">
+        Next, retrieve the data you plan to use and create a dataframe. A dataFrame is a two-dimensional, tabular data structure 
+        with labeled axes known as rows and columns. Since the data we need to create our dataframe is on Kaggle's website we 
+        will do the follwing:
+  </div>
+
+  <div class="code-container">
+      <pre><code>
+      file_path1 = "lap_times.csv"
+      file_path2 = "pit_stops.csv"
+
+      # Load the latest version
+      df = kagglehub.dataset_load(
+      KaggleDatasetAdapter.PANDAS,
+      "rohanrao/formula-1-world-championship-1950-2020",
+      file_path1,
+      )
+    
+      df2 = kagglehub.dataset_load(
+      KaggleDatasetAdapter.PANDAS,
+      "rohanrao/formula-1-world-championship-1950-2020",
+      file_path2,
+      )
       </code></pre>
   </div>
   
